@@ -1,0 +1,6 @@
+﻿  main.c
+C:\Users\Pichau\source\estudos\GettingInformation\GettingInformation\main.c(14,1): warning C4047: 'inicializando': 'HANDLE' difere em níveis de indireção de 'int'
+C:\Users\Pichau\source\estudos\GettingInformation\GettingInformation\main.c(40,44): warning C4047: '=': 'PVOID' difere em níveis de indireção de 'DWORD'
+C:\Users\Pichau\source\estudos\GettingInformation\GettingInformation\main.c(61,39): warning C4047: 'return': 'DWORD' difere em níveis de indireção de 'HANDLE'
+C:\Users\Pichau\source\estudos\GettingInformation\GettingInformation\main.c(96,50): warning C4047: '==': 'DWORD' difere em níveis de indireção de 'void *'
+  GettingInformation.vcxproj -> C:\Users\Pichau\source\estudos\GettingInformation\Debug\GettingInformation.exe
