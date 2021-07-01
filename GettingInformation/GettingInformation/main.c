@@ -11,7 +11,7 @@ int main()
 
         DWORD targetProcId = getProcId(targetProcess);
 
-        HANDLE hProc = 1; //openProc(targetProcess);
+        HANDLE hProc = openProc(targetProcess);
 
         if (!hProc)
         {
@@ -33,13 +33,14 @@ int main()
 HANDLE openProc(char* procName)
 {
     HANDLE hProc;
-    OBJECT_ATTRIBUTES oa;
-    oa.Length = sizeof(OBJECT_ATTRIBUTES);
+    POBJECT_ATTRIBUTES oa = (POBJECT_ATTRIBUTES)calloc(1, sizeof(OBJECT_ATTRIBUTES));
 
-    CLIENT_ID cid;
-    cid.UniqueProcess = getProcId(procName);
+    oa->Length = sizeof(OBJECT_ATTRIBUTES);
 
-    ntUtils.ntOpenProcess(&hProc, PROCESS_ALL_ACCESS, &oa, &cid);
+    PCLIENT_ID cid = (PCLIENT_ID)calloc(1, sizeof(CLIENT_ID));
+    cid->UniqueProcess = getProcId(procName);
+
+    ntUtils.ntOpenProcess(&hProc, PROCESS_ALL_ACCESS, oa, cid);
 
     return hProc;
 }
