@@ -34,7 +34,6 @@ HANDLE openProc(char* procName)
 {
     HANDLE hProc;
     POBJECT_ATTRIBUTES oa = (POBJECT_ATTRIBUTES)calloc(1, sizeof(OBJECT_ATTRIBUTES));
-
     oa->Length = sizeof(OBJECT_ATTRIBUTES);
 
     PCLIENT_ID cid = (PCLIENT_ID)calloc(1, sizeof(CLIENT_ID));
