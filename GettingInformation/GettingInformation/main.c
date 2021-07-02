@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "main.h"
 
-// Just getting some useful information and testing the whole NTAPI world - by Arthur Von Groll
+// Just getting some useful information and testing the whole NTAPI and WINAPI world - by Arthur Von Groll
 
 int main()
 {
@@ -10,6 +10,9 @@ int main()
         targetProcess = "ac_client.exe";
 
         DWORD targetProcId = getProcId(targetProcess);
+        BOOL isX86;
+
+        isProcessX86(targetProcess, &isX86);
 
         HANDLE hProc = openProc(targetProcess);
 
@@ -18,8 +21,6 @@ int main()
             ERRO(L"Não foi possível abrir uma handle para o processo alvo.", L"ERRO 0x0002");
             return 0;
         }
-
-
 
         CloseHandle(hProc);
     }
@@ -65,6 +66,19 @@ DWORD getProcId(char* procName)
     return 0;
 }
 
+BOOL isProcessX86(char* procName, PBOOL returnValue)
+{
+    ULONG isX64;
+    ULONG bugzin;
+    HANDLE procHandle = openProc(procName);
+
+    if (!procHandle) return FALSE;
+    if (!NT_SUCCESS(ntUtils.ntQueryProcess(procHandle, 26, &isX64, sizeof(ULONG), &bugzin))) return FALSE; /* 26 stands for: ProcessWow64Information - MSDN page: https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess */
+
+    *returnValue = isX64 != 0;
+    return TRUE;
+}
+
 BOOL initializeNTFunctions()
 {
 #if X86
@@ -72,7 +86,7 @@ BOOL initializeNTFunctions()
 #elif X64
     ntUtils.ntDllLocation = 0x7FF991EE0000;
 #endif
-    /* Getting all the function addresses that we want */
+    /* Getting all the functions addresses that we want */
     ntUtils.ntReadMemory = (NtReadVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtReadVirtualMemory");
     ntUtils.ntWriteMemory = (NtWriteVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtWriteVirtualMemory");
     ntUtils.ntProtectMemory = (NtProtectVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtProtectVirtualMemory");

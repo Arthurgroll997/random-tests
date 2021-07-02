@@ -1,4 +1,4 @@
-// Simplified and structured NTAPI functions, enums, structures and preprocessor definitions. Most of them are either poorly documented or not even documented by Microsoft at all.
+// Simplified and structured NTAPI functions, enums, structures and preprocessors definitions. Most of them are either poorly documented or not even documented by Microsoft at all.
 // Websites used to get this information:
 // NT Internals: http://undocumented.ntinternals.net/
 // NirSoft: https://www.nirsoft.net/
@@ -10,7 +10,7 @@
 #pragma once
 #include <Windows.h>
 
-/* Preprocessor definitions */
+/* Preprocessors definitions */
 
 #define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
 
@@ -170,6 +170,159 @@ typedef enum _SYSTEM_INFORMATION_CLASS {
     SystemCurrentTimeZoneInformation,
     SystemLookasideInformation
 } SYSTEM_INFORMATION_CLASS, * PSYSTEM_INFORMATION_CLASS;
+
+typedef enum __PROCESS_INFORMATION_CLASS {
+    ProcessBasicInformation,
+    ProcessQuotaLimits,
+    ProcessIoCounters,
+    ProcessVmCounters,
+    ProcessTimes,
+    ProcessBasePriority,
+    ProcessRaisePriority,
+    ProcessDebugPort,
+    ProcessExceptionPort,
+    ProcessAccessToken,
+    ProcessLdtInformation,
+    ProcessLdtSize,
+    ProcessDefaultHardErrorMode,
+    ProcessIoPortHandlers,
+    ProcessPooledUsageAndLimits,
+    ProcessWorkingSetWatch,
+    ProcessUserModeIOPL,
+    ProcessEnableAlignmentFaultFixup,
+    ProcessPriorityClass,
+    ProcessWx86Information,
+    ProcessHandleCount,
+    ProcessAffinityMask,
+    ProcessPriorityBoost,
+    MaxProcessInfoClass
+} PROCESS_INFORMATION_CLASS, *PPROCESS_INFORMATION_CLASS;
+
+typedef struct _RTL_DRIVE_LETTER_CURDIR {
+    USHORT                  Flags;
+    USHORT                  Length;
+    ULONG                   TimeStamp;
+    UNICODE_STRING          DosPath;
+} RTL_DRIVE_LETTER_CURDIR, * PRTL_DRIVE_LETTER_CURDIR;
+
+typedef struct _RTL_USER_PROCESS_PARAMETERS {
+    ULONG                   MaximumLength;
+    ULONG                   Length;
+    ULONG                   Flags;
+    ULONG                   DebugFlags;
+    PVOID                   ConsoleHandle;
+    ULONG                   ConsoleFlags;
+    HANDLE                  StdInputHandle;
+    HANDLE                  StdOutputHandle;
+    HANDLE                  StdErrorHandle;
+    UNICODE_STRING          CurrentDirectoryPath;
+    HANDLE                  CurrentDirectoryHandle;
+    UNICODE_STRING          DllPath;
+    UNICODE_STRING          ImagePathName;
+    UNICODE_STRING          CommandLine;
+    PVOID                   Environment;
+    ULONG                   StartingPositionLeft;
+    ULONG                   StartingPositionTop;
+    ULONG                   Width;
+    ULONG                   Height;
+    ULONG                   CharWidth;
+    ULONG                   CharHeight;
+    ULONG                   ConsoleTextAttributes;
+    ULONG                   WindowFlags;
+    ULONG                   ShowWindowFlags;
+    UNICODE_STRING          WindowTitle;
+    UNICODE_STRING          DesktopName;
+    UNICODE_STRING          ShellInfo;
+    UNICODE_STRING          RuntimeData;
+    RTL_DRIVE_LETTER_CURDIR DLCurrentDirectory[0x20];
+} RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
+
+typedef struct _PEB_FREE_BLOCK {
+    struct _PEB_FREE_BLOCK*         Next;
+    ULONG                           Size;
+} PEB_FREE_BLOCK, *PPEB_FREE_BLOCK;
+
+typedef struct _PEB_LDR_DATA {
+    ULONG                   Length;
+    BOOLEAN                 Initialized;
+    PVOID                   SsHandle;
+    LIST_ENTRY              InLoadOrderModuleList;
+    LIST_ENTRY              InMemoryOrderModuleList;
+    LIST_ENTRY              InInitializationOrderModuleList;
+} PEB_LDR_DATA, *PPEB_LDR_DATA;
+
+/* Someone pls tell me why they created a PPVOID, I really think that that's just useless. Like, just use PVOID* please. */
+typedef PVOID* PPVOID;
+
+typedef struct _PEB {
+    BOOLEAN                 InheritedAddressSpace;
+    BOOLEAN                 ReadImageFileExecOptions;
+    BOOLEAN                 BeingDebugged;
+    BOOLEAN                 Spare;
+    HANDLE                  Mutant;
+    PVOID                   ImageBaseAddress;
+    PPEB_LDR_DATA           LoaderData;
+    PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
+    PVOID                   SubSystemData;
+    PVOID                   ProcessHeap;
+    PVOID                   FastPebLock;
+    PVOID                   FastPebLockRoutine; /*changed from PPEBLOCKROUTINE*/ 
+    PVOID                   FastPebUnlockRoutine; /* changed from PPEBLOCKROUTINE */
+    ULONG                   EnvironmentUpdateCount;
+    PPVOID                  KernelCallbackTable;
+    PVOID                   EventLogSection;
+    PVOID                   EventLog;
+    PPEB_FREE_BLOCK         FreeList;
+    ULONG                   TlsExpansionCounter;
+    PVOID                   TlsBitmap;
+    ULONG                   TlsBitmapBits[0x2];
+    PVOID                   ReadOnlySharedMemoryBase;
+    PVOID                   ReadOnlySharedMemoryHeap;
+    PPVOID                  ReadOnlyStaticServerData;
+    PVOID                   AnsiCodePageData;
+    PVOID                   OemCodePageData;
+    PVOID                   UnicodeCaseTableData;
+    ULONG                   NumberOfProcessors;
+    ULONG                   NtGlobalFlag;
+    BYTE                    Spare2[0x4];
+    LARGE_INTEGER           CriticalSectionTimeout;
+    ULONG                   HeapSegmentReserve;
+    ULONG                   HeapSegmentCommit;
+    ULONG                   HeapDeCommitTotalFreeThreshold;
+    ULONG                   HeapDeCommitFreeBlockThreshold;
+    ULONG                   NumberOfHeaps;
+    ULONG                   MaximumNumberOfHeaps;
+    PPVOID*                 ProcessHeaps;
+    PVOID                   GdiSharedHandleTable;
+    PVOID                   ProcessStarterHelper;
+    PVOID                   GdiDCAttributeList;
+    PVOID                   LoaderLock;
+    ULONG                   OSMajorVersion;
+    ULONG                   OSMinorVersion;
+    ULONG                   OSBuildNumber;
+    ULONG                   OSPlatformId;
+    ULONG                   ImageSubSystem;
+    ULONG                   ImageSubSystemMajorVersion;
+    ULONG                   ImageSubSystemMinorVersion;
+    ULONG                   GdiHandleBuffer[0x22];
+    ULONG                   PostProcessInitRoutine;
+    ULONG                   TlsExpansionBitmap;
+    BYTE                    TlsExpansionBitmapBits[0x80];
+    ULONG                   SessionId;
+} PEB, *PPEB;
+
+/*
+I actually found out this struct telling us what the reserved names are, but it won't be really useful for me.
+You can check it out here:
+https://www.slac.stanford.edu/exp/glast/ground/obsolete-LATSoft-old/old_checkout_package_docs/volume02/pdrApp_v7r2/GaudiKernel/v9/struct_system_1_1_p_r_o_c_e_s_s___b_a_s_i_c___i_n_f_o_r_m_a_t_i_o_n.html
+*/
+typedef struct _PROCESS_BASIC_INFORMATION {
+    PVOID Reserved1;
+    PPEB PebBaseAddress;
+    PVOID Reserved2[2];
+    ULONG_PTR UniqueProcessId;
+    PVOID Reserved3;
+} PROCESS_BASIC_INFORMATION, *PPROCESS_BASIC_INFORMATION;
 
 typedef enum _MEMORY_INFORMATION_CLASS {
     MemoryBasicInformation

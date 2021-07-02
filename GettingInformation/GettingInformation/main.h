@@ -26,6 +26,7 @@ char* targetProcess;
 /* Functions definitions */
 
 HANDLE openProc(char* procName);
+BOOL isProcessX86(char* procName, PBOOL returnValue); // Actually, I'll return whether the function worked or not and the actual return value (if the process is x86) will be set in the returnValue parameter.
 DWORD getProcId(char* procName);
 int main();
 BOOL initializeNTFunctions();
