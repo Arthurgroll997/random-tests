@@ -5,6 +5,9 @@ Testing things with my homies, may contain useful information, who knows ¯\\\_(
 
 - Pattern scanner
 - Bring Jesus back to Earth
+- Query Process Information
+- Manually Map DLL
+- Hide Modules
 
 # Done:
 
