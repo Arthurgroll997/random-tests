@@ -4,10 +4,10 @@ Testing things with my homies, may contain useful information, who knows ¯\\\_(
 # Todo:
 
 - Pattern scanner
-- Bring Jesus back to Earth
 - Query Process Information
 - Manually Map DLL
 - Hide Modules
+- Bring Jesus back to Earth
 
 # Done:
 
