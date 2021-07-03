@@ -9,6 +9,8 @@
 #define GET_REAL_ADDRESS(address, structure, field) (DWORD)address + ((DWORD)(&structure->field) - (DWORD)(structure))
 #define GET_EXT_INFO(handle, address, type, size) *(type*)getExternalInfo(handle, address, size);
 
+/* Structs and global vars definitions */
+
 struct {
 	DWORD ntDllLocation;
 	NtReadVirtualMemory ntReadMemory;
