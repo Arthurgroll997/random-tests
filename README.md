@@ -10,6 +10,6 @@ Testing things with my homies, may contain useful information, who knows ¯\\\_(
 - Bring Jesus back to Earth
 
 # Done:
-
+- Query Module Information
 - Query System Information
 - Read/Write Process Memory
