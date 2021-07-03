@@ -9,11 +9,6 @@ int main()
     {
         targetProcess = "ac_client.exe";
 
-        DWORD targetProcId = getProcId(targetProcess);
-        BOOL isX86;
-
-        isProcessX86(targetProcess, &isX86);
-
         HANDLE hProc = openProc(targetProcess);
 
         if (!hProc)
@@ -22,6 +17,8 @@ int main()
             return 0;
         }
 
+        printf("A base de %s e: 0x%08X", targetProcess, getModuleBaseAddrExternal(hProc, targetProcess));
+
         CloseHandle(hProc);
     }
     else
@@ -29,6 +26,96 @@ int main()
         ERRO(L"Não foi possível inicializar as funções da NTAPI.", L"ERRO 0x0001");
     }
     return 0;
+}
+
+PVOID getExternalInfo(HANDLE hProc, ULONG address, ULONG size)
+{
+    PVOID baseAddr = calloc(size, sizeof(BYTE)); // I like to use it this way, but feel free to use malloc(size) if you want to.
+
+    if (!NT_SUCCESS(ntUtils.ntReadMemory(hProc, address, baseAddr, size, NULL))) return NULL;
+
+    return baseAddr;
+}
+
+DWORD getModuleBaseAddr(HANDLE hProc, char* moduleName)
+{
+    PWCHAR convertedModuleName = (PWCHAR)calloc(strlen(moduleName) + 1, sizeof(WCHAR));
+    mbstowcs(convertedModuleName, moduleName, strlen(moduleName));
+
+    PPEB procPeb = getProcessPEB(hProc);
+    PLIST_ENTRY moduleList = procPeb->LoaderData->InLoadOrderModuleList.Flink;
+    PLDR_MODULE firstModule = (PLDR_MODULE)CONTAINING_RECORD(moduleList, LDR_MODULE, InLoadOrderModuleList);
+
+    PLDR_MODULE nextModule = firstModule;
+    BOOL started = TRUE;
+
+    while (((DWORD)moduleList != (DWORD)firstModule) || (started))
+    {
+        nextModule = (PLDR_MODULE)CONTAINING_RECORD(moduleList, LDR_MODULE, InLoadOrderModuleList);
+
+        if (wcsstr(nextModule->FullDllName.Buffer, convertedModuleName))
+        {
+            return (DWORD)nextModule->BaseAddress;
+        }
+
+        moduleList = moduleList->Flink;
+    }
+
+    return 0;
+}
+
+DWORD getModuleBaseAddrExternal(HANDLE hProc, char* moduleName)
+{
+    PWCHAR convertedModuleName = (PWCHAR)calloc(strlen(moduleName) + 1, sizeof(WCHAR));
+    mbstowcs(convertedModuleName, moduleName, strlen(moduleName));
+
+    PPEB peb = getProcessPEB(hProc);
+    PPEB internalPeb = getProcessPEB(GetCurrentProcess());
+
+    PPEB_LDR_DATA pebLdrData = GET_EXT_INFO(hProc, GET_REAL_ADDRESS(peb, internalPeb, LoaderData), PPEB_LDR_DATA, sizeof(ULONG));  // We want the offset so that we can read the "real" LoaderData from the target process. After we get the offset, what we do is read 4 bytes from the address (that is offset + the peb addres), so we get the pointer to what we want.
+    PPEB_LDR_DATA internalPebLdrData = internalPeb->LoaderData;
+    
+    LIST_ENTRY moduleList = GET_EXT_INFO(hProc, GET_REAL_ADDRESS(pebLdrData, internalPebLdrData, InLoadOrderModuleList), LIST_ENTRY, sizeof(LIST_ENTRY));
+    PLIST_ENTRY realModuleList = GET_REAL_ADDRESS(pebLdrData, internalPebLdrData, InLoadOrderModuleList);
+    PLIST_ENTRY internalModuleList = internalPeb->LoaderData->InLoadOrderModuleList.Flink;
+
+    PLDR_MODULE firstModule = GET_EXT_INFO(hProc, (DWORD)CONTAINING_RECORD(realModuleList, LDR_MODULE, InLoadOrderModuleList), PLDR_MODULE, sizeof(ULONG));
+    PLDR_MODULE internalFirstModule = (PLDR_MODULE)CONTAINING_RECORD(internalModuleList, LDR_MODULE, InLoadOrderModuleList);
+
+    DWORD firstModDword = (DWORD)firstModule;
+    PLDR_MODULE currentModule = firstModule;
+    PLDR_MODULE internalCurrentModule = internalFirstModule;
+
+    do
+    {
+        UNICODE_STRING name = GET_EXT_INFO(hProc, GET_REAL_ADDRESS(currentModule, internalCurrentModule, FullDllName), UNICODE_STRING, sizeof(UNICODE_STRING));
+        UNICODE_STRING internalName = internalCurrentModule->FullDllName;
+        name.Buffer = getExternalInfo(hProc, name.Buffer, name.Length + 2);
+
+        if (name.Buffer == NULL) return 0;
+
+        if (wcsstr(name.Buffer, convertedModuleName))
+        {
+            return (DWORD)GET_EXT_INFO(hProc, GET_REAL_ADDRESS(currentModule, internalCurrentModule, BaseAddress), PVOID, sizeof(ULONG));
+        }
+
+        realModuleList = GET_EXT_INFO(hProc, GET_REAL_ADDRESS(realModuleList, internalModuleList, Flink), PLIST_ENTRY, sizeof(ULONG));
+        internalModuleList = internalModuleList->Flink;
+
+        currentModule = GET_EXT_INFO(hProc, (DWORD)CONTAINING_RECORD(realModuleList, LDR_MODULE, InLoadOrderModuleList), PLDR_MODULE, sizeof(ULONG));
+
+    } while (TRUE);
+
+    return 0;
+}
+
+PPEB getProcessPEB(HANDLE hProc)
+{
+    PROCESS_BASIC_INFORMATION procBasicInfo;
+    ULONG correctLen;
+    if (!NT_SUCCESS(ntUtils.ntQueryProcess(hProc, ProcessBasicInformation, &procBasicInfo, sizeof(PROCESS_BASIC_INFORMATION), &correctLen))) return NULL;
+
+    return procBasicInfo.PebBaseAddress;
 }
 
 HANDLE openProc(char* procName)
