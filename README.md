@@ -3,6 +3,7 @@ Testing things with my homies, may contain useful information, who knows ¯\\\_(
 
 # Todo:
 
+- Query Thread Information
 - Pattern scanner
 - Manually Map DLL
 - Hide Modules
