@@ -140,10 +140,21 @@ DWORD getProcId(char* procName)
 
     PWCHAR procNameConverted = (PWCHAR)calloc(strlen(procName) + 1, sizeof(WCHAR));
     mbstowcs(procNameConverted, procName, strlen(procName));
+    DWORD firstProc = NULL;
 
     for (; procInfo; procInfo = (PSYSTEM_PROCESS_INFORMATION)((DWORD)procInfo + (DWORD)procInfo->NextEntryOffset))
     {
-        if (procInfo->ImageName.Length == 0) continue;
+        if (firstProc == (DWORD)procInfo) return 0;
+
+        if (procInfo->ImageName.Length == 0)
+        {
+            continue;
+        }
+        else if (firstProc == NULL)
+        {
+            firstProc = (DWORD)procInfo;
+        }
+
         if (!wcscmp(procInfo->ImageName.Buffer, procNameConverted))
         {
             return procInfo->ProcessId;
