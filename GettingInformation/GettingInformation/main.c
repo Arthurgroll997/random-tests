@@ -143,7 +143,13 @@ DWORD getProcId(char* procName)
 
     for (; procInfo; procInfo = (PSYSTEM_PROCESS_INFORMATION)((DWORD)procInfo + (DWORD)procInfo->NextEntryOffset))
     {
-        if (procInfo->ImageName.Length == 0) continue;
+        if (((DWORD)procInfo == NULL) || (procInfo->NextEntryOffset == 0)) return 0;
+
+        if (procInfo->ImageName.Length == 0)
+        {
+            continue;
+        }
+
         if (!wcscmp(procInfo->ImageName.Buffer, procNameConverted))
         {
             return procInfo->ProcessId;
