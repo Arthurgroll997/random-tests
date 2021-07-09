@@ -1,5 +1,5 @@
 # random-tests
-Testing things with my homies, may contain useful information, who knows ¯\\\_(ツ)\_/¯
+Testing things with my homies! May contain useful information, who knows ¯\\\_(ツ)\_/¯
 
 # Todo:
 
