@@ -8,7 +8,6 @@ Testing things with my homies! May contain useful information, who knows ¯\\\_(
 - Pattern scanner
 - Manually Map DLL
 - Hide Modules
-- Bring Jesus back to Earth
 
 # Done:
 - Query Process Information
