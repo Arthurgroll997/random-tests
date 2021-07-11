@@ -19,7 +19,7 @@ int main()
 
         DWORD moduleBaseAddr = getModuleBaseAddrExternal(hProc, targetProcess);
         DWORD moduleSize = getModuleSizeExternal(hProc, targetProcess);
-        DWORD patternAddr = (DWORD)(findPattern(hProc, moduleBaseAddr, moduleSize + 1, "\x8B\x44\x24\x2C\x89\x8A\xFC\x00\x00\x00\x89\x82\xF8\x00\x00\x00", "xxxxxxxxxxxxxxxx", 16)) + 10;
+        DWORD patternAddr = (DWORD)(findPattern(hProc, moduleBaseAddr, moduleSize + 1, "\x8B\x44\x24\x2C\x89\x8A\xFC\x00\x00\x00\x89\x82\xF8\x00\x00\x00", "xxxxxxxxxxxxxxxx", 16)); // + 10
 
         printf("A base de %s e: 0x%08X\n", targetProcess, moduleBaseAddr);
         printf("O tamanho de %s e: 0x%08X\n", targetProcess, moduleSize);
