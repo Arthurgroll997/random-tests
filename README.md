@@ -5,7 +5,6 @@ Testing things with my homies! May contain useful information, who knows ¯\\\_(
 
 - Query Thread Information
 - Query Executable Image
-- Pattern scanner
 - Manually Map DLL
 - Hide Modules
 - Hooks
@@ -15,3 +14,4 @@ Testing things with my homies! May contain useful information, who knows ¯\\\_(
 - Query Module Information
 - Query System Information
 - Read/Write Process Memory
+- Pattern scanner
