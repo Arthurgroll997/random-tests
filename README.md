@@ -1,13 +1,17 @@
 # random-tests
-Testing things with my homies, may contain useful information, who knows ¯\\\_(ツ)\_/¯
+Testing things with my homies! May contain useful information, who knows ¯\\\_(ツ)\_/¯
 
 # Todo:
 
+- Query Thread Information
+- Query Executable Image
 - Pattern scanner
-- Read/Write Process Memory
-- Query System Information
-- Bring Jesus back to Earth
+- Manually Map DLL
+- Hide Modules
+- Hooks
 
 # Done:
-
-- A lot of nothing (but wait, it'll have things done soon!)
+- Query Process Information
+- Query Module Information
+- Query System Information
+- Read/Write Process Memory
