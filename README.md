@@ -8,6 +8,7 @@ Testing things with my homies! May contain useful information, who knows ¯\\\_(
 - Pattern scanner
 - Manually Map DLL
 - Hide Modules
+- Hooks
 
 # Done:
 - Query Process Information
